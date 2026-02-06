@@ -26,10 +26,12 @@ const NotFound = () => {
         </h1>
 
         {/* Error Message */}
-        <h2 className="text-2xl font-bold text-foreground mb-2">Page Not Found</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-2">
+          Page Not Found
+        </h2>
         <p className="text-muted-foreground mb-8">
-          Sorry, the page you're looking for doesn't exist. Let's get you back on
-          track.
+          Sorry, the page you're looking for doesn't exist. Let's get you back
+          on track.
         </p>
 
         {/* Back Button */}

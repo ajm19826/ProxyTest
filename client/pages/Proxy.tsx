@@ -73,7 +73,7 @@ export default function Proxy() {
   const fetchProxyContent = async (tab: ProxyTab) => {
     try {
       const response = await fetch(
-        `/api/proxy?url=${encodeURIComponent(tab.url)}`
+        `/api/proxy?url=${encodeURIComponent(tab.url)}`,
       );
 
       if (!response.ok) {
@@ -87,8 +87,8 @@ export default function Proxy() {
         prevTabs.map((t) =>
           t.id === tab.id
             ? { ...t, content: data.content, loading: false, error: "" }
-            : t
-        )
+            : t,
+        ),
       );
     } catch (err) {
       const errorMessage =
@@ -96,10 +96,8 @@ export default function Proxy() {
 
       setTabs((prevTabs) =>
         prevTabs.map((t) =>
-          t.id === tab.id
-            ? { ...t, loading: false, error: errorMessage }
-            : t
-        )
+          t.id === tab.id ? { ...t, loading: false, error: errorMessage } : t,
+        ),
       );
     }
   };
@@ -266,10 +264,7 @@ export default function Proxy() {
 
       {/* Main Content Area - Resizable */}
       {activeTab ? (
-        <ResizablePanelGroup
-          direction="horizontal"
-          className="flex-1"
-        >
+        <ResizablePanelGroup direction="horizontal" className="flex-1">
           <ResizablePanel defaultSize={100} minSize={20}>
             <div className="w-full h-full flex flex-col">
               {/* Loading State */}
@@ -297,7 +292,11 @@ export default function Proxy() {
                     </p>
                     <button
                       onClick={() => {
-                        const updatedTab = { ...activeTab, loading: true, error: "" };
+                        const updatedTab = {
+                          ...activeTab,
+                          loading: true,
+                          error: "",
+                        };
                         fetchProxyContent(updatedTab);
                       }}
                       className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:shadow-lg transition font-medium"
@@ -323,7 +322,12 @@ export default function Proxy() {
 
           {/* Right Sidebar - Optional resizable panel for future features */}
           <ResizableHandle className="bg-border hover:bg-primary transition-colors" />
-          <ResizablePanel defaultSize={0} minSize={0} maxSize={30} className="hidden">
+          <ResizablePanel
+            defaultSize={0}
+            minSize={0}
+            maxSize={30}
+            className="hidden"
+          >
             <div className="w-full h-full bg-secondary/30 flex items-center justify-center text-muted-foreground text-sm">
               Sidebar (future)
             </div>

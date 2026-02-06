@@ -20,7 +20,9 @@ export default function Index() {
 
   const isValidUrl = (urlString: string) => {
     try {
-      new URL(urlString.startsWith("http") ? urlString : `https://${urlString}`);
+      new URL(
+        urlString.startsWith("http") ? urlString : `https://${urlString}`,
+      );
       return true;
     } catch {
       return false;
@@ -31,7 +33,8 @@ export default function Index() {
     {
       icon: Shield,
       title: "Private Testing",
-      description: "Test websites securely through our proxy without exposing your IP",
+      description:
+        "Test websites securely through our proxy without exposing your IP",
     },
     {
       icon: Zap,
@@ -41,7 +44,8 @@ export default function Index() {
     {
       icon: Globe,
       title: "Global Coverage",
-      description: "Access content from anywhere with our worldwide proxy network",
+      description:
+        "Access content from anywhere with our worldwide proxy network",
     },
   ];
 
@@ -56,7 +60,9 @@ export default function Index() {
             </div>
             <span className="text-xl font-bold text-foreground">ProxyTest</span>
           </div>
-          <div className="text-sm text-muted-foreground">Web Proxy for Testing</div>
+          <div className="text-sm text-muted-foreground">
+            Web Proxy for Testing
+          </div>
         </div>
       </nav>
 
@@ -119,7 +125,9 @@ export default function Index() {
             </div>
 
             {!isValidUrl(url) && url.trim() && (
-              <p className="text-sm text-red-500 mt-2">Please enter a valid URL</p>
+              <p className="text-sm text-red-500 mt-2">
+                Please enter a valid URL
+              </p>
             )}
           </form>
 
@@ -148,7 +156,8 @@ export default function Index() {
             Why Choose ProxyTest?
           </h2>
           <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
-            Get fast, secure, and reliable proxy access for all your testing needs
+            Get fast, secure, and reliable proxy access for all your testing
+            needs
           </p>
 
           <div className="grid md:grid-cols-3 gap-8">
