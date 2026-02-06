@@ -20,5 +20,8 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
+  // Proxy endpoint for bypassing CORS
+  app.get("/api/proxy", handleProxy);
+
   return app;
 }
