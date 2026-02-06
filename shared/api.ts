@@ -10,3 +10,12 @@
 export interface DemoResponse {
   message: string;
 }
+
+/**
+ * Response type for /api/proxy
+ */
+export interface ProxyResponse {
+  content: string;
+  contentType: string;
+  url: string;
+}
