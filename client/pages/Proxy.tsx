@@ -12,6 +12,22 @@ interface ProxyTab {
   error: string;
 }
 
+function normalizeAndValidateUrl(input: string): string {
+  const trimmed = input.trim();
+  if (!trimmed) {
+    throw new Error("Empty URL");
+  }
+
+  const fullUrl = trimmed.startsWith("http") ? trimmed : `https://${trimmed}`;
+  const parsed = new URL(fullUrl);
+
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error("Unsupported URL protocol");
+  }
+
+  return parsed.toString();
+}
+
 export default function Proxy() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -34,10 +50,7 @@ export default function Proxy() {
 
     if (urlParam && tabs.length === 0) {
       try {
-        const fullUrl = urlParam.startsWith("http")
-          ? urlParam
-          : `https://${urlParam}`;
-        new URL(fullUrl);
+        const fullUrl = normalizeAndValidateUrl(urlParam);
 
         const tabId = generateTabId();
         const newTab: ProxyTab = {
@@ -135,10 +148,7 @@ export default function Proxy() {
     if (!urlInput.trim()) return;
 
     try {
-      const fullUrl = urlInput.startsWith("http")
-        ? urlInput
-        : `https://${urlInput}`;
-      new URL(fullUrl);
+      const fullUrl = normalizeAndValidateUrl(urlInput);
 
       const tabId = generateTabId();
       const newTab: ProxyTab = {
