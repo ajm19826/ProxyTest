@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Globe } from "lucide-react";
+import { ProxyResponse } from "@shared/api";
 
 export default function Proxy() {
   const [searchParams] = useSearchParams();
@@ -8,6 +9,7 @@ export default function Proxy() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [proxyContent, setProxyContent] = useState("");
 
   useEffect(() => {
     const urlParam = searchParams.get("url");
@@ -24,18 +26,35 @@ export default function Proxy() {
 
       new URL(fullUrl); // Validate URL
       setUrl(fullUrl);
+      fetchProxyContent(fullUrl);
     } catch (err) {
       setError("Invalid URL provided");
+      setLoading(false);
     }
   }, [searchParams, navigate]);
 
-  const handleIframeLoad = () => {
-    setLoading(false);
-  };
+  const fetchProxyContent = async (targetUrl: string) => {
+    try {
+      const response = await fetch(
+        `/api/proxy?url=${encodeURIComponent(targetUrl)}`
+      );
 
-  const handleIframeError = () => {
-    setLoading(false);
-    setError("Failed to load the website. It may be blocking iframe access.");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to fetch content");
+      }
+
+      const data: ProxyResponse = await response.json();
+      setProxyContent(data.content);
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to load the website through proxy"
+      );
+    }
   };
 
   const getDomain = (urlString: string) => {
@@ -118,17 +137,14 @@ export default function Proxy() {
         </div>
       )}
 
-      {/* Iframe Container */}
-      {url && !error && (
+      {/* Iframe Container - renders proxied HTML */}
+      {proxyContent && !error && (
         <div className="flex-1 relative bg-white dark:bg-slate-950">
           <iframe
-            key={url}
-            src={url}
-            onLoad={handleIframeLoad}
-            onError={handleIframeError}
+            srcDoc={proxyContent}
             className="w-full h-full border-0"
             title="Proxied website"
-            sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation-by-user-activation allow-presentation"
+            sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation allow-presentation allow-modals"
           />
         </div>
       )}
