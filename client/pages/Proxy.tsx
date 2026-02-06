@@ -1,12 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Globe, Plus, X } from "lucide-react";
 import { ProxyResponse } from "@shared/api";
-import {
-  ResizableHandle,
-  ResizablePanelGroup,
-  ResizablePanel,
-} from "@/components/ui/resizable";
 
 interface ProxyTab {
   id: string;
@@ -24,6 +19,9 @@ export default function Proxy() {
   const [activeTabId, setActiveTabId] = useState<string>("");
   const [newUrlInput, setNewUrlInput] = useState("");
   const [showNewTabInput, setShowNewTabInput] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const activeTab = tabs.find((t) => t.id === activeTabId);
 
@@ -59,6 +57,37 @@ export default function Proxy() {
       }
     }
   }, [searchParams, navigate]);
+
+  // Handle mouse move for dragging
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging || !containerRef.current) return;
+
+      const container = containerRef.current;
+      const rect = container.getBoundingClientRect();
+      const newWidth = e.clientX - rect.left;
+      const minWidth = 200;
+      const maxWidth = rect.width - 200;
+
+      if (newWidth >= minWidth && newWidth <= maxWidth) {
+        setSidebarWidth(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging]);
 
   const generateTabId = () => `tab-${Date.now()}-${Math.random()}`;
 
@@ -262,11 +291,12 @@ export default function Proxy() {
         </div>
       </div>
 
-      {/* Main Content Area - Resizable */}
-      {activeTab ? (
-        <ResizablePanelGroup direction="horizontal" className="flex-1">
-          <ResizablePanel defaultSize={100} minSize={20}>
-            <div className="w-full h-full flex flex-col">
+      {/* Main Content Area with Resizable Sidebar */}
+      <div ref={containerRef} className="flex-1 flex overflow-hidden">
+        {/* Main Iframe Container */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {activeTab ? (
+            <>
               {/* Loading State */}
               {activeTab.loading && (
                 <div className="flex items-center justify-center flex-1 bg-secondary/30">
@@ -317,30 +347,51 @@ export default function Proxy() {
                   sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation allow-presentation allow-modals"
                 />
               )}
+            </>
+          ) : (
+            <div className="flex-1 flex items-center justify-center bg-secondary/30">
+              <div className="text-center">
+                <Globe className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
+                <p className="text-muted-foreground">No active tab</p>
+              </div>
             </div>
-          </ResizablePanel>
-
-          {/* Right Sidebar - Optional resizable panel for future features */}
-          <ResizableHandle className="bg-border hover:bg-primary transition-colors" />
-          <ResizablePanel
-            defaultSize={0}
-            minSize={0}
-            maxSize={30}
-            className="hidden"
-          >
-            <div className="w-full h-full bg-secondary/30 flex items-center justify-center text-muted-foreground text-sm">
-              Sidebar (future)
-            </div>
-          </ResizablePanel>
-        </ResizablePanelGroup>
-      ) : (
-        <div className="flex-1 flex items-center justify-center bg-secondary/30">
-          <div className="text-center">
-            <Globe className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-muted-foreground">No active tab</p>
-          </div>
+          )}
         </div>
-      )}
+
+        {/* Resizable Handle and Right Sidebar (hidden by default, can be toggled) */}
+        {sidebarWidth > 0 && (
+          <>
+            <div
+              onMouseDown={() => setIsDragging(true)}
+              className={`w-1 hover:w-1.5 bg-border hover:bg-primary transition-all cursor-col-resize ${
+                isDragging ? "bg-primary w-1.5" : ""
+              }`}
+            />
+            <div
+              style={{ width: `${sidebarWidth}px` }}
+              className="bg-secondary/30 border-l border-border flex flex-col overflow-hidden"
+            >
+              <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm p-4">
+                <button
+                  onClick={() => setSidebarWidth(0)}
+                  className="text-xs px-3 py-1 bg-card rounded border border-border hover:border-primary transition"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Toggle Sidebar Button (when sidebar is hidden) */}
+        {sidebarWidth === 0 && (
+          <button
+            onClick={() => setSidebarWidth(300)}
+            className="w-1 hover:w-2 bg-border hover:bg-primary transition-all cursor-col-resize"
+            title="Drag to resize or click to open sidebar"
+          />
+        )}
+      </div>
     </div>
   );
 }
