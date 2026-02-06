@@ -10,7 +10,7 @@ A modern, production-ready web proxy application for testing and research. Acces
 🎨 **Modern Interface** - Clean, professional design with smooth animations  
 ⚡ **Fast & Lightweight** - Minimal footprint, instant loading  
 🔄 **Tab Management** - Create, switch, and close tabs effortlessly  
-🎯 **URL Validation** - Smart URL detection (accepts `example.com` or `https://example.com`)  
+🎯 **URL Validation** - Smart URL detection (accepts `example.com` or `https://example.com`)
 
 ## Tech Stack
 
@@ -46,11 +46,13 @@ The application will be available at `http://localhost:5173` (or the port shown 
 ## Usage
 
 ### Homepage
+
 1. Enter a website URL in the input field
 2. Click "Access" or press Enter
 3. The website will load in the proxy viewer
 
 ### Proxy Viewer
+
 - **Create New Tab**: Click the "+ New" button or the "+" icon in the tab bar
 - **Switch Tabs**: Click on any tab to view that website
 - **Close Tab**: Click the "X" button on a tab to close it
@@ -59,7 +61,9 @@ The application will be available at `http://localhost:5173` (or the port shown 
 - **Resize**: Drag the right edge to open/close the sidebar (optional)
 
 ### URL Format
+
 The proxy accepts URLs in multiple formats:
+
 - Domain only: `example.com`
 - With protocol: `https://example.com`
 - With path: `example.com/page`
@@ -89,12 +93,15 @@ The proxy accepts URLs in multiple formats:
 ## API Endpoints
 
 ### GET `/api/proxy`
+
 Fetches content from a URL and bypasses CORS restrictions.
 
 **Query Parameters:**
+
 - `url` (required): The URL to proxy (string)
 
 **Response:**
+
 ```json
 {
   "content": "<!DOCTYPE html>...",
@@ -104,6 +111,7 @@ Fetches content from a URL and bypasses CORS restrictions.
 ```
 
 **Example:**
+
 ```bash
 curl "http://localhost:5173/api/proxy?url=https://example.com"
 ```
@@ -155,7 +163,9 @@ pnpm build
 5. **CORS Policy** - The backend bypasses CORS restrictions at the server level, not the browser level
 
 ### Sandbox Restrictions
+
 The iframe uses a security sandbox that allows:
+
 - ✅ Scripts and popups
 - ✅ Forms and navigation
 - ✅ Presentations and modals
@@ -170,13 +180,16 @@ The iframe uses a security sandbox that allows:
 ## Troubleshooting
 
 ### Website Won't Load
+
 - **Issue**: "Unable to Load" error message
 - **Solution**: The website may block iframe access or have security restrictions. Try clicking "Retry" or use "Open" to visit directly
 
 ### Tab Not Responding
+
 - **Solution**: Click "Retry" button or close and reopen the tab
 
 ### Slow Performance
+
 - **Solution**: Close unused tabs or refresh the page
 
 ## Contributing
