@@ -6,10 +6,11 @@ import { createServer } from "./server";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   // For GitHub Pages deployment, set base to repo name (if deploying to /reponame/)
-  // Leave as "/" for user/organization pages or local development
+  // For local development, use "/"
+  // Change "/ProxyTest/" to "/" if deploying to a user/organization GitHub Pages
   const isProduction = mode === "production";
-  //const base = isProduction ? "/" : "/";
-const base = "/ProxyTest/";
+  const base = isProduction ? "/ProxyTest/" : "/";
+
   return {
     base,
     server: {
