@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Globe, Plus, X } from "lucide-react";
-import { ProxyResponse } from "@shared/api";
 
 interface ProxyTab {
   id: string;
@@ -10,22 +9,6 @@ interface ProxyTab {
   content: string;
   loading: boolean;
   error: string;
-}
-
-function normalizeAndValidateUrl(input: string): string {
-  const trimmed = input.trim();
-  if (!trimmed) {
-    throw new Error("Empty URL");
-  }
-
-  const fullUrl = trimmed.startsWith("http") ? trimmed : `https://${trimmed}`;
-  const parsed = new URL(fullUrl);
-
-  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-    throw new Error("Unsupported URL protocol");
-  }
-
-  return parsed.toString();
 }
 
 export default function Proxy() {
@@ -50,7 +33,10 @@ export default function Proxy() {
 
     if (urlParam && tabs.length === 0) {
       try {
-        const fullUrl = normalizeAndValidateUrl(urlParam);
+        const fullUrl = urlParam.startsWith("http")
+          ? urlParam
+          : `https://${urlParam}`;
+        new URL(fullUrl);
 
         const tabId = generateTabId();
         const newTab: ProxyTab = {
@@ -114,21 +100,43 @@ export default function Proxy() {
 
   const fetchProxyContent = async (tab: ProxyTab) => {
     try {
-      const response = await fetch(
-        `/api/proxy?url=${encodeURIComponent(tab.url)}`,
-      );
+      // Using allorigins.win - a free CORS proxy service
+      const corsProxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(
+        tab.url,
+      )}`;
+
+      const response = await fetch(corsProxyUrl);
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to fetch content");
+        throw new Error(`Failed to fetch: ${response.statusText}`);
       }
 
-      const data: ProxyResponse = await response.json();
+      const data = await response.json();
+      let content = data.contents;
+
+      if (!content) {
+        throw new Error("No content received from proxy service");
+      }
+
+      // Inject a base tag to fix relative URLs
+      const baseUrl = new URL(tab.url);
+      const baseTag = `<base href="${baseUrl.origin}/" />`;
+
+      // Insert base tag in the head
+      if (content.includes("<head>")) {
+        content = content.replace("<head>", `<head>${baseTag}`);
+      } else if (content.includes("<HEAD>")) {
+        content = content.replace("<HEAD>", `<HEAD>${baseTag}`);
+      } else if (content.includes("<html>")) {
+        content = content.replace("<html>", `<html><head>${baseTag}</head>`);
+      } else if (content.includes("<HTML>")) {
+        content = content.replace("<HTML>", `<HTML><head>${baseTag}</head>`);
+      }
 
       setTabs((prevTabs) =>
         prevTabs.map((t) =>
           t.id === tab.id
-            ? { ...t, content: data.content, loading: false, error: "" }
+            ? { ...t, content: content, loading: false, error: "" }
             : t,
         ),
       );
@@ -148,7 +156,10 @@ export default function Proxy() {
     if (!urlInput.trim()) return;
 
     try {
-      const fullUrl = normalizeAndValidateUrl(urlInput);
+      const fullUrl = urlInput.startsWith("http")
+        ? urlInput
+        : `https://${urlInput}`;
+      new URL(fullUrl);
 
       const tabId = generateTabId();
       const newTab: ProxyTab = {
