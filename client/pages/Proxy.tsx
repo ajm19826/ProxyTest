@@ -36,13 +36,17 @@ export default function Proxy() {
         const fullUrl = urlParam.startsWith("http")
           ? urlParam
           : `https://${urlParam}`;
-        new URL(fullUrl);
+        const parsed = new URL(fullUrl);
+        if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+          navigate("/");
+          return;
+        }
 
         const tabId = generateTabId();
         const newTab: ProxyTab = {
           id: tabId,
-          url: fullUrl,
-          domain: getDomain(fullUrl),
+          url: parsed.toString(),
+          domain: getDomain(parsed.toString()),
           content: "",
           loading: true,
           error: "",
@@ -159,13 +163,17 @@ export default function Proxy() {
       const fullUrl = urlInput.startsWith("http")
         ? urlInput
         : `https://${urlInput}`;
-      new URL(fullUrl);
+      const parsed = new URL(fullUrl);
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        // Disallow potentially dangerous schemes like javascript:, data:, etc.
+        return;
+      }
 
       const tabId = generateTabId();
       const newTab: ProxyTab = {
         id: tabId,
-        url: fullUrl,
-        domain: getDomain(fullUrl),
+        url: parsed.toString(),
+        domain: getDomain(parsed.toString()),
         content: "",
         loading: true,
         error: "",
