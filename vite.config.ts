@@ -8,8 +8,8 @@ export default defineConfig(({ mode }) => {
   // For GitHub Pages deployment, set base to repo name (if deploying to /reponame/)
   // Leave as "/" for user/organization pages or local development
   const isProduction = mode === "production";
-  const base = isProduction ? "/" : "/";
-
+  //const base = isProduction ? "/" : "/";
+const base = "/ProxyTest/";
   return {
     base,
     server: {
