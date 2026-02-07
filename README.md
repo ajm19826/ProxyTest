@@ -88,8 +88,8 @@ The proxy accepts URLs in multiple formats:
 
 ## API Endpoints
 
-### GET `/api/proxy`
-Fetches content from a URL and bypasses CORS restrictions.
+### GET `/api/proxy` (Backend Only - Not Available on GitHub Pages)
+Fetches content from a URL and bypasses CORS restrictions using your own server.
 
 **Query Parameters:**
 - `url` (required): The URL to proxy (string)
@@ -107,6 +107,8 @@ Fetches content from a URL and bypasses CORS restrictions.
 ```bash
 curl "http://localhost:5173/api/proxy?url=https://example.com"
 ```
+
+**Note:** This endpoint is only available when running the backend server locally or on platforms like Netlify/Vercel that support Node.js. On GitHub Pages, the app uses `allorigins.win` as a public CORS proxy service instead.
 
 ## Deployment
 
