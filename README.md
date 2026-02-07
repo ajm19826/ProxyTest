@@ -185,7 +185,11 @@ pnpm build
 2. **JavaScript Execution** - The proxy allows JavaScript execution within the iframe sandbox
 3. **Responsible Use** - This tool is for testing and research only. Use responsibly and respect website terms of service
 4. **No Data Storage** - This application does not store any user data
-5. **CORS Policy** - The backend bypasses CORS restrictions at the server level, not the browser level
+5. **CORS Policy**:
+   - **With Backend** (local/Netlify/Vercel): The server bypasses CORS restrictions at the server level
+   - **GitHub Pages**: Uses a public CORS proxy service (allorigins.win), which may have rate limits or availability issues
+6. **Rate Limiting** - GitHub Pages deployment uses a third-party CORS proxy that may rate-limit requests
+7. **Proxy Service Terms** - When using GitHub Pages, you agree to the terms of the allorigins.win service
 
 ### Sandbox Restrictions
 The iframe uses a security sandbox that allows:
